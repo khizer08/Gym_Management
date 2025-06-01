@@ -1,6 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Login - IronPulse Gym</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-form">
+            <h2><i class="fas fa-user"></i> Member Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="member_id">Member ID</label>
+                    <input type="text" id="member_id" name="id" placeholder="Enter your Member ID" required>
+                </div>
+                <button type="submit" id="loginBtn">Login</button>
+            </form>
+            <div class="form-footer">
+                <p>Don't have an account? <a href="add-member.html">Register here</a></p>
+                <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const memberId = document.getElementById('member_id').value;
+            // Store member ID in localStorage for future use
+            localStorage.setItem('currentMemberId', memberId);
+            // Redirect to dashboard
+            window.location.href = 'member-dashboard.html';
+        });
+    </script>
+=======
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IronPulse Gym | Member Login</title>

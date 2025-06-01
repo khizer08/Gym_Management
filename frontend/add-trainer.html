@@ -2,41 +2,102 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Add New Trainer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add New Trainer - IronPulse Gym</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="header"> Add New Trainer - IronPulse Gym</div>
+  <div class="container">
+    <div class="form-container">
+      <h2><i class="fas fa-user-plus"></i> Add New Trainer</h2>
+      <div id="errorMessage" class="error-message"></div>
+      <form id="addTrainerForm">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="age">Age</label>
+          <input type="number" id="age" name="age" min="16" max="100" required>
+        </div>
+        <div class="form-group">
+          <label for="gender">Gender</label>
+          <select id="gender" name="gender" required>
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+         <div class="form-group">
+          <label for="specialization">Specialization</label>
+          <input type="text" id="specialization" name="specialization" required>
+        </div>
+        <button type="submit" id="submitBtn">Add Trainer</button>
+      </form>
+       <div class="form-footer">
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
+      </div>
+    </div>
+  </div>
 
-  <form id="trainerForm">
-    <h2>Trainer Admission Form</h2>
-    
-    <label>Full Name</label>
-    <input type="text" name="trainer_name" required>
+  <script>
+    document.getElementById('addTrainerForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
 
-    <label>Age</label>
-    <input type="number" name="trainer_age" required>
+      const submitBtn = document.getElementById('submitBtn');
+      const errorMessage = document.getElementById('errorMessage');
+      errorMessage.style.display = 'none'; // Hide previous errors
 
-    <label>Gender</label>
-    <select name="trainer_gender" required>
-      <option value="">Select</option>
-      <option>Male</option>
-      <option>Female</option>
-      <option>Other</option>
-    </select>
+      try {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding Trainer...';
 
-    <label>Phone Number</label>
-    <input type="text" name="trainer_phone" required>
+        const formData = {
+          name: document.getElementById('name').value,
+          age: parseInt(document.getElementById('age').value),
+          gender: document.getElementById('gender').value,
+          phone: document.getElementById('phone').value,
+          email: document.getElementById('email').value,
+          specialization: document.getElementById('specialization').value
+        };
 
-    <label>Email</label>
-    <input type="email" name="trainer_email" required>
+        const response = await fetch('http://localhost:3000/api/trainers', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
 
-    <label>Specialization</label>
-    <input type="text" name="trainer_specialization" required>
+        const data = await response.json();
 
-    <button type="submit">Add Trainer</button>
-  </form>
-  <script src="trainer-form.js"></script>
+        if (response.ok) { // Check if status is 2xx
+          // alert(data.message); // Or a more sophisticated success message
+          window.location.href = `welcome-trainer.html?id=${data.trainerId}`; // Redirect on success with trainer ID
+        } else {
+          errorMessage.textContent = data.message || 'Failed to add trainer.';
+          errorMessage.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Error adding trainer:', error);
+        errorMessage.textContent = 'An error occurred. Please try again.';
+        errorMessage.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Add Trainer';
+      }
+    });
+  </script>
 </body>
 </html>

@@ -6,7 +6,7 @@ async function checkAssignedMembers() {
         connection = await mysql.createConnection({
             host: 'localhost',
             user: 'root',
-            password: 'root',
+            password: 'Surjo@14',
             database: 'gym_management'
         });
         console.log('Connected to database.');

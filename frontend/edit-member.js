@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Form elements
-    const form = document.getElementById('memberForm');
+    const form = document.getElementById('editMemberForm');
     const resetBtn = document.getElementById('resetBtn');
     const submitBtn = document.getElementById('submitBtn');
     const formMessage = document.getElementById('formMessage');
@@ -10,7 +10,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const API_BASE_URL = 'http://localhost:3000/api';
     const MEMBERS_API = `${API_BASE_URL}/members`;
 
-    // Fetch trainers from API (placeholder - you'll need to implement this endpoint)
+    // Get member ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const memberId = urlParams.get('id');
+
+    if (!memberId) {
+        showError('No member ID provided');
+        return;
+    }
+
+    // Fetch trainers from API
     async function fetchTrainers() {
         try {
             const response = await fetch(`${API_BASE_URL}/trainers`);
@@ -34,6 +43,39 @@ document.addEventListener('DOMContentLoaded', function() {
             option.textContent = `${trainer.name} (${trainer.specialty})`;
             trainerSelect.appendChild(option);
         });
+    }
+
+    // Fetch member details
+    async function fetchMemberDetails() {
+        try {
+            showLoading();
+            const response = await fetch(`${MEMBERS_API}/${memberId}`);
+            const data = await response.json();
+
+            if (data.success) {
+                populateForm(data.data);
+            } else {
+                showError(data.message || 'Failed to fetch member details');
+            }
+        } catch (error) {
+            console.error('Error fetching member details:', error);
+            showError('Failed to fetch member details. Please try again.');
+        } finally {
+            hideLoading();
+        }
+    }
+
+    // Populate form with member details
+    function populateForm(member) {
+        document.getElementById('member_name').value = member.name;
+        document.getElementById('member_age').value = member.age;
+        document.getElementById('member_gender').value = member.gender;
+        document.getElementById('member_phone').value = member.phone;
+        document.getElementById('member_email').value = member.email;
+        document.getElementById('membership_plan').value = member.membership_plan;
+        if (member.assigned_trainer_id) {
+            document.getElementById('assigned_trainer').value = member.assigned_trainer_id;
+        }
     }
 
     // Form validation
@@ -108,12 +150,6 @@ document.addEventListener('DOMContentLoaded', function() {
         field.parentNode.appendChild(errorElement);
     }
 
-    // Format date for display
-    function formatDate(dateString) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString(undefined, options);
-    }
-
     // Form submission
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -122,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 // Show loading state
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
                 
                 // Prepare form data
                 const formData = new FormData(form);
@@ -137,8 +173,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
 
                 // Send data to API
-                const response = await fetch(MEMBERS_API, {
-                    method: 'POST',
+                const response = await fetch(`${MEMBERS_API}/${memberId}`, {
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -148,28 +184,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await response.json();
 
                 if (data.success) {
-                    // Show success message with member details
                     formMessage.innerHTML = `
                         <div class="success-message">
                             <p><i class="fas fa-check-circle"></i> ${data.message}</p>
-                            <div class="member-details">
-                                <p><strong>Member ID:</strong> <span class="highlight">${data.member_id}</span></p>
-                                <p><strong>Membership Valid Until:</strong> <span class="highlight">${formatDate(data.membership_end)}</span></p>
-                            </div>
-                            <p class="note">Please note down the Member ID for future reference</p>
                         </div>
                     `;
                     formMessage.classList.add('success');
                     
-                    // Clear form (keep trainer selection)
-                    const currentTrainer = trainerSelect.value;
-                    form.reset();
-                    trainerSelect.value = currentTrainer;
-                    
-                    // Redirect after 5 seconds
+                    // Redirect after 3 seconds
                     setTimeout(() => {
                         window.location.href = 'members.html';
-                    }, 5000);
+                    }, 3000);
                 } else {
                     // Show validation errors
                     if (data.errors) {
@@ -186,19 +211,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 formMessage.classList.add('error');
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Add Member';
+                submitBtn.textContent = 'Update Member';
             }
         }
     });
 
     // Reset form
     resetBtn.addEventListener('click', function() {
-        form.reset();
+        fetchMemberDetails(); // Reset to original values
         document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
         document.querySelectorAll('.error-message').forEach(el => el.remove());
         formMessage.textContent = '';
     });
 
-    // Initialize form
+    // Show loading spinner
+    function showLoading() {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+    }
+
+    // Hide loading spinner
+    function hideLoading() {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Update Member';
+    }
+
+    // Initialize
     populateTrainers();
-});
+    fetchMemberDetails();
+}); 

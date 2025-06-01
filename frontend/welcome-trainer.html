@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome Trainer - IronPulse Gym</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .welcome-container {
+      text-align: center;
+      margin-top: 50px;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .welcome-container h2 {
+      color: #6a1b9a; /* Adjust color to match theme */
+      margin-bottom: 15px;
+    }
+    .welcome-container p {
+      font-size: 1.1em;
+      margin-bottom: 20px;
+    }
+    .welcome-container .trainer-id {
+      font-weight: bold;
+      color: #333;
+    }
+    .welcome-container .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      color: #6a1b9a; /* Adjust color */
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .welcome-container .back-link i {
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="welcome-container">
+      <h2><i class="fas fa-check-circle"></i> Trainer Added Successfully!</h2>
+      <p>Welcome aboard! The new trainer has been successfully registered.</p>
+      <p>Trainer ID: <span class="trainer-id" id="trainerId"></span></p>
+      <a href="trainer-dashboard.html" class="back-link"><i class="fas fa-tachometer-alt"></i> Go to Trainer Dashboard</a>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const trainerId = urlParams.get('id');
+      const trainerIdSpan = document.getElementById('trainerId');
+      
+      if (trainerId) {
+        trainerIdSpan.textContent = trainerId;
+      } else {
+        trainerIdSpan.textContent = 'N/A';
+      }
+    });
+  </script>
+</body>
+</html> 
