@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Member - IronPulse Gym</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Member</h1>
+        <div id="formMessage" class="form-message"></div>
+        
+        <form id="editMemberForm" class="member-form">
+            <div class="form-group">
+                <label for="member_name">Full Name</label>
+                <input type="text" id="member_name" name="member_name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="member_age">Age</label>
+                <input type="number" id="member_age" name="member_age" min="16" max="100" required>
+            </div>
+
+            <div class="form-group">
+                <label for="member_gender">Gender</label>
+                <select id="member_gender" name="member_gender" required>
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="member_phone">Phone Number</label>
+                <input type="tel" id="member_phone" name="member_phone" pattern="[0-9]{10}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="member_email">Email</label>
+                <input type="email" id="member_email" name="member_email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="membership_plan">Membership Plan</label>
+                <select id="membership_plan" name="membership_plan" required>
+                    <option value="">Select Plan</option>
+                    <option value="Monthly">Monthly</option>
+                    <option value="Quarterly">Quarterly</option>
+                    <option value="Yearly">Yearly</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="assigned_trainer">Assigned Trainer</label>
+                <select id="assigned_trainer" name="assigned_trainer">
+                    <option value="">Select Trainer</option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" id="resetBtn" class="btn-secondary">Reset</button>
+                <button type="submit" id="submitBtn" class="btn-primary">Update Member</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="edit-member.js"></script>
+</body>
+</html> 

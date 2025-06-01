@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to IronPulse Gym</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .welcome-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            text-align: center;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .welcome-icon {
+            font-size: 64px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        .member-id {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2196F3;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        .welcome-message {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .action-buttons {
+            margin-top: 30px;
+        }
+        .action-buttons a {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 0 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .login-btn {
+            background: #4CAF50;
+            color: white;
+        }
+        .home-btn {
+            background: #f5f5f5;
+            color: #333;
+        }
+        .action-buttons a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <i class="fas fa-dumbbell welcome-icon"></i>
+        <h1>Welcome to IronPulse Gym!</h1>
+        <p class="welcome-message">
+            Hey there! Welcome to IronPulse Gym! Let's be a part of each other's journey to fitness and wellness.
+            We're excited to have you join our community!
+        </p>
+        <div class="member-id">
+            Your Member ID: <span id="memberId"></span>
+        </div>
+        <p>Please save this ID for future logins.</p>
+        <div class="action-buttons">
+            <a href="member-login.html" class="login-btn">Go to Login</a>
+            <a href="index.html" class="home-btn">Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        // Get member ID from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const memberId = urlParams.get('id');
+        if (memberId) {
+            document.getElementById('memberId').textContent = memberId;
+        }
+    </script>
+</body>
+</html> 
