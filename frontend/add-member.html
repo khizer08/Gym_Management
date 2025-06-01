@@ -334,6 +334,36 @@
       document.getElementById('addMemberForm').reset();
       document.getElementById('errorMessage').style.display = 'none';
     });
+
+    // Fetch trainers and populate the dropdown
+    async function fetchAndPopulateTrainers() {
+      const trainerSelect = document.getElementById('assigned_trainer');
+      try {
+        const response = await fetch('http://localhost:3000/api/trainers');
+        const data = await response.json();
+
+        if (data.success) {
+          // Clear existing options (except the default)
+          trainerSelect.innerHTML = '<option value="">Select Trainer</option>';
+
+          data.data.forEach(trainer => {
+            const option = document.createElement('option');
+            option.value = trainer.trainer_id;
+            option.textContent = trainer.name;
+            trainerSelect.appendChild(option);
+          });
+        } else {
+          console.error('Error fetching trainers:', data.message);
+          // Optionally show an error message to the user
+        }
+      } catch (error) {
+        console.error('Error fetching trainers:', error);
+        // Optionally show an error message to the user
+      }
+    }
+
+    // Call the function to fetch and populate trainers when the page loads
+    fetchAndPopulateTrainers();
   </script>
 </body>
 </html>
