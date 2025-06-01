@@ -1,53 +1,274 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Add New Trainer - IronPulse Gym</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #2b2d42;
+      --secondary: #2b2d42;
+      --accent: #2b2d42;
+      --light: #f8f9fa;
+      --dark: #212529;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--secondary);
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      background-size: cover;
+      filter: brightness(1.0);
+      z-index: -1;
+    }
+
+    .header {
+      width: 100%;
+      max-width: 800px;
+      background: #2b2d42;
+      padding: 1.5rem 2rem;
+      margin-top: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--light);
+    }
+    
+    .form-container {
+      background:  #f8f9fa;
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+      padding: 3rem 4rem;
+      width: 90%;
+      max-width: 800px;
+      margin: 2rem auto;
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .form-container h2 {
+      background: #ff3e3e;
+      border-radius: 20px;
+      width: 103%;
+      padding: 3rem 3rem;
+      max-width: 800px;
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      align-items: center;
+      color: var(--primary);
+    }
+
+    .form-container h2 i {
+      margin-right: 15px;
+      color: var(--secondary);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--dark);
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #dfe6e9;
+      border-radius: 12px;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(43, 45, 66, 0.2);
+      outline: none;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    .btn:hover::before {
+      transform: translateX(0);
+    }
+
+    .btn.primary {
+      color: white;
+      background: linear-gradient(135deg, var(--secondary), #1a1a2e);
+      box-shadow: 0 5px 15px rgba(255, 62, 62, 0.5);
+    }
+
+    .btn.secondary {
+      color: var(--secondary);
+      background: rgba(255, 255, 255, 0.8);
+      border: 2px solid var(--secondary);
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+    }
+
+    .form-footer {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    .back-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .back-link i {
+      margin-right: 8px;
+    }
+
+    .error-message {
+      display: none;
+      color: red;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .form-container {
+        padding: 2rem;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <div class="form-container">
-      <h2><i class="fas fa-user-plus"></i> Add New Trainer</h2>
-      <div id="errorMessage" class="error-message"></div>
-      <form id="addTrainerForm">
-        <div class="form-group">
-          <label for="name">Full Name</label>
-          <input type="text" id="name" name="name" required>
-        </div>
-        <div class="form-group">
-          <label for="age">Age</label>
-          <input type="number" id="age" name="age" min="16" max="100" required>
-        </div>
-        <div class="form-group">
-          <label for="gender">Gender</label>
-          <select id="gender" name="gender" required>
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="phone">Phone Number</label>
-          <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required>
-        </div>
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" required>
-        </div>
-         <div class="form-group">
-          <label for="specialization">Specialization</label>
-          <input type="text" id="specialization" name="specialization" required>
-        </div>
-        <button type="submit" id="submitBtn">Add Trainer</button>
-      </form>
-       <div class="form-footer">
-        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
+  <div class="header">
+    <i class="fas fa-user-plus"></i>
+    <span>Add New Trainer - IronPulse Gym</span>
+  </div>
+
+  <div class="form-container">
+    <h2><i class="fas fa-user-plus"></i> Add New Trainer</h2>
+    <div id="errorMessage" class="error-message"></div>
+    <form id="addTrainerForm">
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" required>
       </div>
+      <div class="form-group">
+        <label for="age">Age</label>
+        <input type="number" id="age" name="age" min="16" max="100" required>
+      </div>
+      <div class="form-group">
+        <label for="gender">Gender</label>
+        <select id="gender" name="gender" required>
+          <option value="">Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div class="form-group">
+        <label for="specialization">Specialization</label>
+        <input type="text" id="specialization" name="specialization" required>
+      </div>
+
+      <div class="form-actions">
+  <button type="button" id="resetBtn" class="btn secondary">
+    <i class="fas fa-undo"></i> Reset
+  </button>
+  <button type="submit" id="submitBtn" class="btn primary">
+    <i class="fas fa-user-plus"></i> Add Trainer
+  </button>
+</div>
+      </div>
+    </form>
+
+    <div class="form-footer">
+      <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
     </div>
   </div>
 
@@ -83,7 +304,6 @@
         const data = await response.json();
 
         if (response.ok) { // Check if status is 2xx
-          // alert(data.message); // Or a more sophisticated success message
           window.location.href = `welcome-trainer.html?id=${data.trainerId}`; // Redirect on success with trainer ID
         } else {
           errorMessage.textContent = data.message || 'Failed to add trainer.';
@@ -95,9 +315,13 @@
         errorMessage.style.display = 'block';
       } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Add Trainer';
+        submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Add Trainer';
       }
     });
+    document.getElementById('resetBtn').addEventListener('click', function() {
+  document.getElementById('addTrainerForm').reset();
+  document.getElementById('errorMessage').style.display = 'none';
+});
   </script>
 </body>
 </html>
