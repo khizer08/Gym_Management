@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Members - IronPulse Gym</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2b2d42;
+      --secondary: #2b2d42;
+      --accent: #2b2d42;
+      --light: #f8f9fa;
+      --dark: #212529;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+      min-height: 100vh;
+      color: var(--secondary);
+    }
+
+    .header {
+      width: 100%;
+      background: #2b2d42;
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--light);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .members-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .member-card {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .member-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .member-info {
+      margin-bottom: 15px;
+    }
+
+    .member-info h3 {
+      color: var(--primary);
+      margin-bottom: 10px;
+      font-size: 1.2rem;
+    }
+
+    .member-details {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .member-details p {
+      margin: 5px 0;
+    }
+
+    .member-details i {
+      width: 20px;
+      margin-right: 10px;
+      color: var(--primary);
+    }
+
+    .back-link {
+      display: inline-block;
+      margin: 20px;
+      color: var(--secondary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .back-link:hover {
+      color: var(--primary);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      font-size: 1.2rem;
+      color: #666;
+    }
+
+    .error-message {
+      text-align: center;
+      padding: 20px;
+      color: #dc3545;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <i class="fas fa-users"></i>
+    <h1>View Members</h1>
+  </div>
+
+  <div class="container">
+    <a href="owner-dashboard.html" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Owner Dashboard
+    </a>
+
+    <div id="membersGrid" class="members-grid">
+      <div class="loading">Loading members...</div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      const membersGrid = document.getElementById('membersGrid');
+
+      try {
+        const response = await fetch('http://localhost:3000/api/members');
+        const data = await response.json();
+
+        if (data.success) {
+          membersGrid.innerHTML = ''; // Clear loading message
+          
+          data.data.forEach(member => {
+            const memberCard = document.createElement('div');
+            memberCard.className = 'member-card';
+            
+            memberCard.innerHTML = `
+              <div class="member-info">
+                <h3>${member.name}</h3>
+              </div>
+              <div class="member-details">
+                <p><i class="fas fa-id-card"></i> ID: ${member.member_id}</p>
+                <p><i class="fas fa-user"></i> Age: ${member.age}</p>
+                <p><i class="fas fa-venus-mars"></i> Gender: ${member.gender}</p>
+                <p><i class="fas fa-phone"></i> Phone: ${member.phone}</p>
+                <p><i class="fas fa-envelope"></i> Email: ${member.email}</p>
+                <p><i class="fas fa-calendar-alt"></i> Plan: ${member.membership_plan}</p>
+                <p><i class="fas fa-calendar-check"></i> Join Date: ${new Date(member.join_date).toLocaleDateString()}</p>
+              </div>
+            `;
+            
+            membersGrid.appendChild(memberCard);
+          });
+        } else {
+          membersGrid.innerHTML = '<div class="error-message">Error loading members</div>';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        membersGrid.innerHTML = '<div class="error-message">Error loading members</div>';
+      }
+    });
+  </script>
+</body>
+</html> 

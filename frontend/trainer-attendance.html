@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trainer Attendance - IronPulse Gym</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2b2d42;
+      --secondary: #2b2d42;
+      --accent: #2b2d42;
+      --light: #f8f9fa;
+      --dark: #212529;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+      min-height: 100vh;
+      color: var(--secondary);
+    }
+
+    .header {
+      width: 100%;
+      background: #2b2d42;
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--light);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .attendance-table {
+      width: 100%;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+
+    .attendance-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .attendance-table th,
+    .attendance-table td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    .attendance-table th {
+      background: var(--primary);
+      color: white;
+      font-weight: 500;
+    }
+
+    .attendance-table tr:hover {
+      background: #f8f9fa;
+    }
+
+    .status-badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .status-present {
+      background: #e3fcef;
+      color: #00a854;
+    }
+
+    .status-absent {
+      background: #fff1f0;
+      color: #f5222d;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin: 20px;
+      color: var(--secondary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .back-link:hover {
+      color: var(--primary);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      font-size: 1.2rem;
+      color: #666;
+    }
+
+    .error-message {
+      text-align: center;
+      padding: 20px;
+      color: #dc3545;
+      font-size: 1.2rem;
+    }
+
+    .date-filter {
+      margin: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .date-filter input {
+      padding: 8px 12px;
+      border: 2px solid #dfe6e9;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .date-filter button {
+      padding: 8px 15px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .date-filter button:hover {
+      opacity: 0.9;
+    }
+
+    .trainer-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin: 20px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .stat-card h3 {
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+
+    .stat-card .value {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--secondary);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <i class="fas fa-user-tie"></i>
+    <h1>Trainer Attendance</h1>
+  </div>
+
+  <div class="container">
+    <a href="owner-dashboard.html" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Owner Dashboard
+    </a>
+
+    <div class="trainer-stats">
+      <div class="stat-card">
+        <h3>Total Trainers</h3>
+        <div class="value" id="totalTrainers">-</div>
+      </div>
+      <div class="stat-card">
+        <h3>Present Today</h3>
+        <div class="value" id="presentToday">-</div>
+      </div>
+      <div class="stat-card">
+        <h3>Average Hours</h3>
+        <div class="value" id="avgHours">-</div>
+      </div>
+    </div>
+
+    <div class="date-filter">
+      <input type="date" id="dateFilter">
+      <button onclick="filterByDate()">Filter</button>
+      <button onclick="resetFilter()">Reset</button>
+    </div>
+
+    <div class="attendance-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Trainer Name</th>
+            <th>Check In</th>
+            <th>Check Out</th>
+            <th>Duration</th>
+            <th>Status</th>
+            <th>Members Trained</th>
+          </tr>
+        </thead>
+        <tbody id="attendanceBody">
+          <tr>
+            <td colspan="6" class="loading">Loading attendance records...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    let allAttendanceData = [];
+    let allTrainers = [];
+
+    async function fetchTrainerData() {
+      try {
+        const response = await fetch('http://localhost:3000/api/trainers');
+        const data = await response.json();
+
+        if (data.success) {
+          allTrainers = data.data;
+          document.getElementById('totalTrainers').textContent = allTrainers.length;
+          await fetchAttendanceData();
+        }
+      } catch (error) {
+        console.error('Error fetching trainers:', error);
+      }
+    }
+
+    async function fetchAttendanceData() {
+      try {
+        const response = await fetch('http://localhost:3000/api/workout-attendance');
+        const data = await response.json();
+
+        if (data.success) {
+          allAttendanceData = data.data;
+          displayAttendance(allAttendanceData);
+          updateStats();
+        } else {
+          document.getElementById('attendanceBody').innerHTML = `
+            <tr>
+              <td colspan="6" class="error-message">Error loading attendance records</td>
+            </tr>
+          `;
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('attendanceBody').innerHTML = `
+          <tr>
+            <td colspan="6" class="error-message">Error loading attendance records</td>
+          </tr>
+        `;
+      }
+    }
+
+    function displayAttendance(attendanceData) {
+      const tbody = document.getElementById('attendanceBody');
+      tbody.innerHTML = '';
+
+      attendanceData.forEach(record => {
+        const checkIn = new Date(record.check_in);
+        const checkOut = record.check_out ? new Date(record.check_out) : null;
+        const duration = checkOut ? calculateDuration(checkIn, checkOut) : 'Not checked out';
+        const status = checkOut ? 'Present' : 'Active';
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${record.trainer_name || 'Loading...'}</td>
+          <td>${formatDateTime(checkIn)}</td>
+          <td>${checkOut ? formatDateTime(checkOut) : '-'}</td>
+          <td>${duration}</td>
+          <td><span class="status-badge status-${status.toLowerCase()}">${status}</span></td>
+          <td>${record.members_trained || 0}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function formatDateTime(date) {
+      return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function calculateDuration(start, end) {
+      const diff = end - start;
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      return `${hours}h ${minutes}m`;
+    }
+
+    function filterByDate() {
+      const dateFilter = document.getElementById('dateFilter').value;
+      if (!dateFilter) {
+        displayAttendance(allAttendanceData);
+        return;
+      }
+
+      const filteredData = allAttendanceData.filter(record => {
+        const checkInDate = new Date(record.check_in).toDateString();
+        const filterDate = new Date(dateFilter).toDateString();
+        return checkInDate === filterDate;
+      });
+
+      displayAttendance(filteredData);
+    }
+
+    function resetFilter() {
+      document.getElementById('dateFilter').value = '';
+      displayAttendance(allAttendanceData);
+    }
+
+    function updateStats() {
+      const today = new Date().toDateString();
+      const presentToday = allAttendanceData.filter(record => 
+        new Date(record.check_in).toDateString() === today && record.check_out
+      ).length;
+      
+      document.getElementById('presentToday').textContent = presentToday;
+
+      // Calculate average hours
+      const completedSessions = allAttendanceData.filter(record => record.check_out);
+      if (completedSessions.length > 0) {
+        const totalHours = completedSessions.reduce((sum, record) => {
+          const duration = new Date(record.check_out) - new Date(record.check_in);
+          return sum + (duration / (1000 * 60 * 60));
+        }, 0);
+        const avgHours = (totalHours / completedSessions.length).toFixed(1);
+        document.getElementById('avgHours').textContent = avgHours + 'h';
+      }
+    }
+
+    // Initial load
+    document.addEventListener('DOMContentLoaded', async () => {
+      await fetchTrainerData();
+    });
+  </script>
+</body>
+</html> 
