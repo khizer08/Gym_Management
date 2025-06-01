@@ -119,6 +119,45 @@
       color: #dc3545;
       font-size: 1.2rem;
     }
+
+    .search-container {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .search-container input[type="text"] {
+      padding: 10px 15px;
+      width: 100%;
+      max-width: 400px;
+      border: 2px solid #dfe6e9;
+      border-radius: 25px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .search-container input[type="text"]:focus {
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(43, 45, 66, 0.2);
+      outline: none;
+    }
+
+    .delete-btn {
+      background: #dc3545; /* Red color for delete */
+      color: white;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      margin-top: 15px;
+    }
+
+    .delete-btn:hover {
+      background: #c82333;
+      transform: translateY(-2px);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
   </style>
 </head>
 <body>
@@ -132,43 +171,40 @@
       <i class="fas fa-arrow-left"></i> Back to Owner Dashboard
     </a>
 
+    <div class="search-container">
+      <input type="text" id="memberSearch" placeholder="Search by name or ID...">
+    </div>
+
     <div id="membersGrid" class="members-grid">
       <div class="loading">Loading members...</div>
     </div>
   </div>
 
   <script>
+    let allMembers = []; // Store all members here
+
     document.addEventListener('DOMContentLoaded', async function() {
       const membersGrid = document.getElementById('membersGrid');
+      const memberSearchInput = document.getElementById('memberSearch');
 
+      // Fetch members initially
+      await fetchMembers();
+
+      // Add event listener for search input
+      memberSearchInput.addEventListener('input', function() {
+        filterMembers(this.value);
+      });
+    });
+
+    async function fetchMembers() {
+      const membersGrid = document.getElementById('membersGrid');
       try {
         const response = await fetch('http://localhost:3000/api/members');
         const data = await response.json();
 
         if (data.success) {
-          membersGrid.innerHTML = ''; // Clear loading message
-          
-          data.data.forEach(member => {
-            const memberCard = document.createElement('div');
-            memberCard.className = 'member-card';
-            
-            memberCard.innerHTML = `
-              <div class="member-info">
-                <h3>${member.name}</h3>
-              </div>
-              <div class="member-details">
-                <p><i class="fas fa-id-card"></i> ID: ${member.member_id}</p>
-                <p><i class="fas fa-user"></i> Age: ${member.age}</p>
-                <p><i class="fas fa-venus-mars"></i> Gender: ${member.gender}</p>
-                <p><i class="fas fa-phone"></i> Phone: ${member.phone}</p>
-                <p><i class="fas fa-envelope"></i> Email: ${member.email}</p>
-                <p><i class="fas fa-calendar-alt"></i> Plan: ${member.membership_plan}</p>
-                <p><i class="fas fa-calendar-check"></i> Join Date: ${new Date(member.join_date).toLocaleDateString()}</p>
-              </div>
-            `;
-            
-            membersGrid.appendChild(memberCard);
-          });
+          allMembers = data.data; // Store fetched members
+          displayMembers(allMembers); // Display all initially
         } else {
           membersGrid.innerHTML = '<div class="error-message">Error loading members</div>';
         }
@@ -176,7 +212,83 @@
         console.error('Error:', error);
         membersGrid.innerHTML = '<div class="error-message">Error loading members</div>';
       }
-    });
+    }
+
+    function displayMembers(members) {
+      const membersGrid = document.getElementById('membersGrid');
+      membersGrid.innerHTML = ''; // Clear existing content
+
+      if (members.length === 0) {
+        membersGrid.innerHTML = '<div class="loading">No members found.</div>';
+        return;
+      }
+
+      members.forEach(member => {
+        const memberCard = document.createElement('div');
+        memberCard.className = 'member-card';
+        memberCard.dataset.memberId = member.member_id; // Store member ID
+        
+        memberCard.innerHTML = `
+          <div class="member-info">
+            <h3>${member.name}</h3>
+          </div>
+          <div class="member-details">
+            <p><i class="fas fa-id-card"></i> ID: ${member.member_id}</p>
+            <p><i class="fas fa-user"></i> Age: ${member.age}</p>
+            <p><i class="fas fa-venus-mars"></i> Gender: ${member.gender}</p>
+            <p><i class="fas fa-phone"></i> Phone: ${member.phone}</p>
+            <p><i class="fas fa-envelope"></i> Email: ${member.email}</p>
+            <p><i class="fas fa-calendar-alt"></i> Plan: ${member.membership_plan}</p>
+            <p><i class="fas fa-calendar-check"></i> Join Date: ${new Date(member.join_date).toLocaleDateString()}</p>
+          </div>
+          <button class="delete-btn"><i class="fas fa-trash"></i> Delete</button>
+        `;
+        
+        // Add event listener for the delete button
+        memberCard.querySelector('.delete-btn').addEventListener('click', function() {
+          confirmDelete(member.member_id, memberCard);
+        });
+
+        membersGrid.appendChild(memberCard);
+      });
+    }
+
+    function filterMembers(searchTerm) {
+      const filteredMembers = allMembers.filter(member => {
+        const searchLower = searchTerm.toLowerCase();
+        return (member.name && member.name.toLowerCase().includes(searchLower)) || 
+               (member.member_id && member.member_id.toString().includes(searchLower));
+      });
+      displayMembers(filteredMembers);
+    }
+
+    async function confirmDelete(memberId, memberCardElement) {
+      if (confirm(`Are you sure you want to delete member with ID ${memberId}?`)) {
+        await deleteMember(memberId, memberCardElement);
+      }
+    }
+
+    async function deleteMember(memberId, memberCardElement) {
+      try {
+        const response = await fetch(`http://localhost:3000/api/members/${memberId}`, {
+          method: 'DELETE'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert('Member deleted successfully!');
+          memberCardElement.remove(); // Remove the card from UI
+          // Optionally remove from allMembers array as well
+          allMembers = allMembers.filter(member => member.member_id !== memberId);
+        } else {
+          alert(data.message || 'Failed to delete member.');
+        }
+      } catch (error) {
+        console.error('Error deleting member:', error);
+        alert('An error occurred while deleting member.');
+      }
+    }
   </script>
 </body>
 </html> 
