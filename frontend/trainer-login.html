@@ -173,11 +173,33 @@
   </div>
 
   <script>
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       const trainerId = document.getElementById('trainer_id').value;
-      localStorage.setItem('currentTrainerId', trainerId);
-      window.location.href = 'trainer-dashboard.html';
+      
+      try {
+        // Record attendance
+        const attendanceResponse = await fetch('http://localhost:3000/api/trainer-attendance/check-in', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ trainer_id: trainerId })
+        });
+
+        const attendanceData = await attendanceResponse.json();
+        
+        if (attendanceData.success) {
+          localStorage.setItem('currentTrainerId', trainerId);
+          localStorage.setItem('currentAttendanceId', attendanceData.attendanceId);
+          window.location.href = 'trainer-dashboard.html';
+        } else {
+          alert('Error recording attendance. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error during login. Please try again.');
+      }
     });
   </script>
 </body>

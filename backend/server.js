@@ -12,6 +12,7 @@ app.use('/api/members', require('./routes/members'));
 app.use('/api/trainers', require('./routes/trainers'));
 // app.use('/api/equipment', require('./routes/equipment'));
 app.use('/api/attendance', require('./routes/attendance'));
+app.use('/api/trainer-attendance', require('./routes/trainer-attendance'));
 app.use('/api/workout-attendance', require('./routes/workout-attendance'));
 app.use('/api/workouts', require('./routes/workouts'));
 

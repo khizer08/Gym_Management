@@ -25,6 +25,7 @@ async function initializeDatabase() {
         await connection.query('DROP TABLE IF EXISTS members');
         await connection.query('DROP TABLE IF EXISTS workouts');
         await connection.query('DROP TABLE IF EXISTS trainers');
+        await connection.query('DROP TABLE IF EXISTS trainer_attendance');
         console.log('Dropped existing tables');
 
         // Create trainers table
@@ -127,6 +128,19 @@ async function initializeDatabase() {
             )
         `);
         console.log('Workout attendance table created');
+
+        // Create trainer attendance table
+        await connection.query(`
+            CREATE TABLE IF NOT EXISTS trainer_attendance (
+                attendance_id INT AUTO_INCREMENT PRIMARY KEY,
+                trainer_id INT NOT NULL,
+                check_in TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                check_out TIMESTAMP NULL,
+                FOREIGN KEY (trainer_id) REFERENCES trainers(trainer_id)
+            )
+        `);
+        console.log('Trainer attendance table created');
+
 
         // Insert sample trainers
         const trainers = [
