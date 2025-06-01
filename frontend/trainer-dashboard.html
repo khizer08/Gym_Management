@@ -9,18 +9,50 @@
   <link rel="stylesheet" href="styles.css">
   <style>
     /* Add specific styles for the dashboard if needed */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('images/pic4.jpg') no-repeat center center fixed;
+      background-size: cover;
+      filter: brightness(0.6); /* Adjust brightness for readability */
+      z-index: -1;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 20px auto;
+        padding: 20px;
+    }
+
     .dashboard-container {
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+      padding: 3rem 4rem;
+      width: 100%;
+      max-width: 800px;
+      margin: 2rem auto;
+      animation: fadeInUp 0.6s ease-out forwards;
     }
     .member-list-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
+      padding: 15px;
+      margin-bottom: 10px;
+      background-color: #f8f9fa; /* Light background for list items */
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      border-left: 5px solid var(--secondary); /* Accent border */
+      transition: all 0.3s ease;
+    }
+    .member-list-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
     }
     .member-list-item:last-child {
       border-bottom: none;
@@ -28,15 +60,60 @@
     .member-name {
       flex-grow: 1;
       margin-right: 20px;
+      font-weight: 500;
+      color: var(--dark);
     }
     .update-button-container {
-      margin-top: 20px;
+      margin-top: 30px;
       text-align: center;
     }
      .loading-spinner {
       display: inline-block;
       margin-left: 10px;
     }
+    h2, h3 {
+        color: var(--secondary);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    h2 {
+        font-size: 2rem;
+    }
+     h3 {
+        font-size: 1.5rem;
+        margin-top: 20px;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+    }
+    .form-footer {
+        margin-top: 30px;
+        text-align: center;
+    }
+    .back-link {
+        display: inline-block;
+        margin-top: 10px;
+        color: var(--secondary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s;
+    }
+    .back-link:hover {
+        color: var(--primary);
+    }
+     .workout-select {
+        padding: 8px 12px;
+        border: 2px solid #dfe6e9;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        background-color: rgba(255, 255, 255, 0.8);
+        transition: all 0.3s ease;
+    }
+    .workout-select:focus {
+        border-color: var(--secondary);
+        box-shadow: 0 0 0 3px rgba(43, 45, 66, 0.2);
+        outline: none;
+    }
+
   </style>
 </head>
 <body>
@@ -73,7 +150,7 @@
         // Fetch trainer data
         const trainerResponse = await fetch(`http://localhost:3000/api/trainers/${trainerId}`);
         const trainerData = await trainerResponse.json();
-        trainerNameSpan.textContent = trainerData.name;
+        trainerNameSpan.textContent = trainerData.data.name;
 
         // Fetch members and workouts
         await fetchMembersAndWorkouts();
@@ -94,7 +171,7 @@
             if (checkOutData.success) {
               localStorage.removeItem('currentTrainerId');
               localStorage.removeItem('currentAttendanceId');
-              window.location.href = 'trainer-login.html';
+              window.location.href = 'index.html';
             } else {
               alert('Error recording check-out. Please try again.');
             }
@@ -136,39 +213,81 @@
 
       function displayMembers(members, workouts) {
         membersListDiv.innerHTML = ''; // Clear loading message
-        members.forEach(member => {
-          const memberItem = document.createElement('div');
-          memberItem.classList.add('member-list-item');
-          memberItem.dataset.memberId = member.member_id;
+        const today = new Date().toISOString().split('T')[0];
 
-          const memberName = document.createElement('span');
-          memberName.classList.add('member-name');
-          memberName.textContent = member.name;
+        // Fetch workout attendance for the current day for all members
+        // Note: This might not be the most efficient way for a large number of members.
+        // A backend endpoint to get attendance for a list of member IDs would be better.
+        fetchWorkoutAttendanceForMembers(members.map(m => m.member_id), today).then(completedWorkouts => {
 
-          const workoutSelect = document.createElement('select');
-          workoutSelect.classList.add('workout-select');
+           console.log('Received completed workouts for today:', completedWorkouts); // Added logging
 
-          // Add a default option
-          const defaultOption = document.createElement('option');
-          defaultOption.value = '';
-          defaultOption.textContent = '-- Select Workout --';
-          workoutSelect.appendChild(defaultOption);
+          members.forEach(member => {
+            const memberItem = document.createElement('div');
+            memberItem.classList.add('member-list-item');
+            memberItem.dataset.memberId = member.member_id;
 
-          // Add workout options
-          workouts.forEach(workout => {
-            const option = document.createElement('option');
-            option.value = workout.workout_id;
-            option.textContent = workout.name;
-            if (member.assigned_workout_id === workout.workout_id) {
-              option.selected = true;
+            const memberName = document.createElement('span');
+            memberName.classList.add('member-name');
+            memberName.textContent = member.name;
+
+            // Add completion indicator
+            const completionIndicator = document.createElement('span');
+            completionIndicator.classList.add('completion-indicator');
+            // Ensure member_id comparison is robust
+            if (completedWorkouts.some(cw => parseInt(cw.member_id) === parseInt(member.member_id))) {
+                completionIndicator.innerHTML = '<i class="fas fa-check-circle" style="color: green; margin-left: 5px;"></i>';
+            } else {
+                completionIndicator.innerHTML = '<i class="fas fa-times-circle" style="color: red; margin-left: 5px;"></i>';
             }
-            workoutSelect.appendChild(option);
-          });
+            memberName.appendChild(completionIndicator);
 
-          memberItem.appendChild(memberName);
-          memberItem.appendChild(workoutSelect);
-          membersListDiv.appendChild(memberItem);
+            const workoutSelect = document.createElement('select');
+            workoutSelect.classList.add('workout-select');
+
+            // Add a default option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = '-- Select Workout --';
+            workoutSelect.appendChild(defaultOption);
+
+            // Add workout options
+            workouts.forEach(workout => {
+              const option = document.createElement('option');
+              option.value = workout.workout_id;
+              option.textContent = workout.name;
+              if (member.assigned_workout_id === workout.workout_id) {
+                option.selected = true;
+              }
+              workoutSelect.appendChild(option);
+            });
+
+            memberItem.appendChild(memberName);
+            memberItem.appendChild(workoutSelect);
+            membersListDiv.appendChild(memberItem);
+          });
         });
+      }
+
+      async function fetchWorkoutAttendanceForMembers(memberIds, date) {
+        try {
+          // For now, fetch all workout attendance and filter by date and member ID
+          // A dedicated backend endpoint for fetching attendance for a list of member IDs on a specific date would be more efficient
+          const response = await fetch(`http://localhost:3000/api/workout-attendance?memberIds=${memberIds.join(',')}&date=${date}`);
+          const data = await response.json();
+
+          if (data.success && data.data) {
+            const completed = data.data;
+             console.log('Fetched workout attendance data from API:', data.data); // Added logging
+            return completed;
+          } else {
+            console.error('Error fetching workout attendance:', data.message);
+            return [];
+          }
+        } catch (error) {
+          console.error('Error fetching workout attendance:', error);
+          return [];
+        }
       }
 
       updatePlansBtn.addEventListener('click', async function() {

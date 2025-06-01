@@ -230,7 +230,7 @@
       <ul class="sidebar-menu">
         <li><a href="#" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
         <li><a href="view-member.html"><i class="fas fa-users"></i> Members</a></li>
-        <li><a href="view-trainer.html"><i class="fas fa-dumbbell"></i> Trainers</a></li>
+        <li><a href="view-trainers.html"><i class="fas fa-dumbbell"></i> Trainers</a></li>
         
         
         <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
@@ -295,5 +295,43 @@
       </div>
     </div>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Fetch and display total members count
+      try {
+        const response = await fetch('http://localhost:3000/api/members');
+        const data = await response.json();
+        if (data.success && data.data) {
+          document.querySelector('.stat-card:nth-child(1) .value').textContent = data.data.length;
+        } else {
+          console.error('Error fetching members count:', data.message);
+          document.querySelector('.stat-card:nth-child(1) .value').textContent = 'N/A';
+        }
+      } catch (error) {
+        console.error('Error fetching members count:', error);
+        document.querySelector('.stat-card:nth-child(1) .value').textContent = 'Error';
+      }
+
+      // Fetch and display total trainers count
+      // Note: The backend currently returns all trainers, not just active ones.
+      // This will display the total number of trainers.
+      try {
+        const response = await fetch('http://localhost:3000/api/trainers');
+        const data = await response.json();
+        if (data.success && data.data) {
+          document.querySelector('.stat-card:nth-child(2) .value').textContent = data.data.length;
+        } else {
+          console.error('Error fetching trainers count:', data.message);
+          document.querySelector('.stat-card:nth-child(2) .value').textContent = 'N/A';
+        }
+      } catch (error) {
+        console.error('Error fetching trainers count:', error);
+        document.querySelector('.stat-card:nth-child(2) .value').textContent = 'Error';
+      }
+
+      // TODO: Add logic to fetch and display active trainers based on attendance if needed
+    });
+  </script>
 </body>
 </html>
