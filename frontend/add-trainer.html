@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Add New Trainer - IronPulse Gym</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     :root {
       --primary: #2b2d42;
@@ -60,9 +62,9 @@
       font-weight: 600;
       color: var(--light);
     }
-    
+
     .form-container {
-      background:  #f8f9fa;
+      background: #f8f9fa;
       border-radius: 20px;
       box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
       padding: 3rem 4rem;
@@ -71,12 +73,19 @@
       margin: 2rem auto;
       animation: fadeInUp 0.6s ease-out forwards;
     }
-    
+
     @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-    
+
     .form-container h2 {
       background: #ff3e3e;
       border-radius: 20px;
@@ -216,8 +225,9 @@
     }
   </style>
 </head>
+
 <body>
- <div class="header">
+  <div class="header">
     <span><b>IronPulse Gym -</b></span>
     <img src="images/logo.png" style="width:50px; height:50px; border-radius:50%;">
   </div>
@@ -257,23 +267,23 @@
       </div>
 
       <div class="form-actions">
-  <button type="button" id="resetBtn" class="btn secondary">
-    <i class="fas fa-undo"></i> Reset
-  </button>
-  <button type="submit" id="submitBtn" class="btn primary">
-    <i class="fas fa-user-plus"></i> Add Trainer
-  </button>
-</div>
+        <button type="button" id="resetBtn" class="btn secondary">
+          <i class="fas fa-undo"></i> Reset
+        </button>
+        <button type="submit" id="submitBtn" class="btn primary">
+          <i class="fas fa-user-plus"></i> Add Trainer
+        </button>
       </div>
-    </form>
+  </div>
+  </form>
 
-    <div class="form-footer">
-      <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
-    </div>
+  <div class="form-footer">
+    <a href="owner-dashboard.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Owner Dashboard</a>
+  </div>
   </div>
 
   <script>
-    document.getElementById('addTrainerForm').addEventListener('submit', async function(e) {
+    document.getElementById('addTrainerForm').addEventListener('submit', async function (e) {
       e.preventDefault();
 
       const submitBtn = document.getElementById('submitBtn');
@@ -318,10 +328,11 @@
         submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Add Trainer';
       }
     });
-    document.getElementById('resetBtn').addEventListener('click', function() {
-  document.getElementById('addTrainerForm').reset();
-  document.getElementById('errorMessage').style.display = 'none';
-});
+    document.getElementById('resetBtn').addEventListener('click', function () {
+      document.getElementById('addTrainerForm').reset();
+      document.getElementById('errorMessage').style.display = 'none';
+    });
   </script>
 </body>
+
 </html>

@@ -253,7 +253,7 @@
 
     async function fetchAttendanceData() {
       try {
-        const response = await fetch('http://localhost:3000/api/workout-attendance');
+        const response = await fetch('http://localhost:3000/api/trainer-attendance');
         const data = await response.json();
 
         if (data.success) {
