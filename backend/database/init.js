@@ -3,7 +3,7 @@ const mysql = require('mysql2/promise');
 async function initializeDatabase() {
     let connection;
     try {
-        // First connect without database
+        // Connect without database first
         connection = await mysql.createConnection({
             host: 'localhost',
             user: 'root',
@@ -17,7 +17,7 @@ async function initializeDatabase() {
         // Use the database
         await connection.query('USE gym_management');
 
-        // Drop existing tables in correct order (child tables first)
+        // Drop existing tables (child to parent order)
         await connection.query('DROP TABLE IF EXISTS workout_attendance');
         await connection.query('DROP TABLE IF EXISTS workout_sessions');
         await connection.query('DROP TABLE IF EXISTS payments');
@@ -28,7 +28,9 @@ async function initializeDatabase() {
         await connection.query('DROP TABLE IF EXISTS trainers');
         console.log('Dropped existing tables');
 
-        // Create trainers table
+        // Create tables in parent to child order
+
+        // Trainers
         await connection.query(`
             CREATE TABLE IF NOT EXISTS trainers (
                 trainer_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -39,9 +41,8 @@ async function initializeDatabase() {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
-        console.log('Trainers table created');
 
-        // Create workouts table
+        // Workouts
         await connection.query(`
             CREATE TABLE IF NOT EXISTS workouts (
                 workout_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -51,12 +52,11 @@ async function initializeDatabase() {
                 duration INT,
                 capacity INT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (trainer_id) REFERENCES trainers(trainer_id)
+                FOREIGN KEY (trainer_id) REFERENCES trainers(trainer_id) on delete cascade on update cascade
             )
         `);
-        console.log('Workouts table created');
 
-        // Create members table
+        // Members
         await connection.query(`
             CREATE TABLE IF NOT EXISTS members (
                 member_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -69,25 +69,23 @@ async function initializeDatabase() {
                 assigned_trainer INT,
                 assigned_workout_id INT,
                 join_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (assigned_trainer) REFERENCES trainers(trainer_id),
+                FOREIGN KEY (assigned_trainer) REFERENCES trainers(trainer_id) on delete cascade on update cascade,
                 FOREIGN KEY (assigned_workout_id) REFERENCES workouts(workout_id)
             )
         `);
-        console.log('Members table created');
 
-        // Create attendance table
+        // Attendance
         await connection.query(`
             CREATE TABLE IF NOT EXISTS attendance (
                 attendance_id INT PRIMARY KEY AUTO_INCREMENT,
                 member_id INT NOT NULL,
                 check_in TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 check_out TIMESTAMP NULL,
-                FOREIGN KEY (member_id) REFERENCES members(member_id)
+                FOREIGN KEY (member_id) REFERENCES members(member_id) on delete cascade on update cascade
             )
         `);
-        console.log('Attendance table created');
 
-        // Create payments table
+        // Payments
         await connection.query(`
             CREATE TABLE IF NOT EXISTS payments (
                 payment_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -95,12 +93,11 @@ async function initializeDatabase() {
                 amount DECIMAL(10,2) NOT NULL,
                 payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 payment_type ENUM('Membership', 'Personal Training', 'Other') NOT NULL,
-                FOREIGN KEY (member_id) REFERENCES members(member_id)
+                FOREIGN KEY (member_id) REFERENCES members(member_id) on delete cascade on update cascade
             )
         `);
-        console.log('Payments table created');
 
-        // Create workout sessions table
+        // Workout Sessions
         await connection.query(`
             CREATE TABLE IF NOT EXISTS workout_sessions (
                 session_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -110,113 +107,113 @@ async function initializeDatabase() {
                 start_time TIME NOT NULL,
                 end_time TIME NOT NULL,
                 notes TEXT,
-                FOREIGN KEY (member_id) REFERENCES members(member_id),
-                FOREIGN KEY (trainer_id) REFERENCES trainers(trainer_id)
+                FOREIGN KEY (member_id) REFERENCES members(member_id) on delete cascade on update cascade,
+                FOREIGN KEY (trainer_id) REFERENCES trainers(trainer_id) on delete cascade on update cascade
             )
         `);
-        console.log('Workout sessions table created');
 
-        // Create workout attendance table
+        // Workout Attendance
         await connection.query(`
             CREATE TABLE IF NOT EXISTS workout_attendance (
                 record_id INT PRIMARY KEY AUTO_INCREMENT,
                 member_id INT NOT NULL,
                 workout_id INT NOT NULL,
                 date DATE NOT NULL,
-                FOREIGN KEY (member_id) REFERENCES members(member_id),
+                FOREIGN KEY (member_id) REFERENCES members(member_id) on delete cascade on update cascade,
                 FOREIGN KEY (workout_id) REFERENCES workouts(workout_id)
             )
         `);
-        console.log('Workout attendance table created');
 
-        // Create trainer attendance table
+        // Trainer Attendance
         await connection.query(`
             CREATE TABLE IF NOT EXISTS trainer_attendance (
                 attendance_id INT AUTO_INCREMENT PRIMARY KEY,
                 trainer_id INT NOT NULL,
                 check_in TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 check_out TIMESTAMP NULL,
-                FOREIGN KEY (trainer_id) REFERENCES trainers(trainer_id)
+                FOREIGN KEY (trainer_id) REFERENCES trainers(trainer_id) on delete cascade on update cascade
+                    
             )
         `);
-        console.log('Trainer attendance table created');
 
+        console.log('All tables created');
 
-        // Insert sample trainers
+        // Insert trainers
         const trainers = [
             ['Syed Khizer', 'syedironpulse@gmail.com', 'Weight Training', '9988776655'],
             ['David Warner', 'davidironpulse@gmail.com', 'Cardio', '9988776644'],
             ['Sam Sulek', 'samsulek@gmail.com', 'CrossFit', '9988776633']
         ];
-
         await connection.query('INSERT INTO trainers (name, email, specialization, phone) VALUES ?', [trainers]);
         console.log('Sample trainers inserted');
 
-        // Insert sample workouts first
+        // Insert workouts
         const workouts = [
             ['Full Body Workout', 'Complete body workout focusing on all major muscle groups', 1, 60, 20],
             ['Cardio Blast', 'High-intensity cardio workout', 2, 45, 15],
             ['Beginner Strength', 'Basic strength training for beginners', 3, 45, 10]
         ];
-
         await connection.query('INSERT INTO workouts (name, description, trainer_id, duration, capacity) VALUES ?', [workouts]);
         console.log('Sample workouts inserted');
 
-        // Insert sample members after workouts are created
+        // Insert members
         const members = [
             ['Alice Brown', 25, 'Female', '555-0001', 'alice@example.com', 'Monthly', 1, 1],
             ['Bob Davis', 30, 'Male', '555-0002', 'bob@example.com', 'Quarterly', 1, 2],
             ['Carol Evans', 28, 'Female', '555-0003', 'carol@example.com', 'Yearly', 2, 3],
             ['David Foster', 35, 'Male', '555-0004', 'david@example.com', 'Monthly', 3, 1]
         ];
-
         await connection.query('INSERT INTO members (name, age, gender, phone, email, membership_plan, assigned_trainer, assigned_workout_id) VALUES ?', [members]);
         console.log('Sample members inserted');
 
-        // Insert sample attendance records
+        // Insert attendance
         const attendance = [
             [1, '2024-03-15 08:00:00', '2024-03-15 10:00:00'],
             [2, '2024-03-15 09:00:00', '2024-03-15 11:00:00'],
             [3, '2024-03-15 10:00:00', '2024-03-15 12:00:00']
         ];
-
         await connection.query('INSERT INTO attendance (member_id, check_in, check_out) VALUES ?', [attendance]);
         console.log('Sample attendance records inserted');
 
-        // Insert sample payments
+        // Insert payments
         const payments = [
             [1, 99.99, '2024-03-01 10:00:00', 'Membership'],
             [2, 249.99, '2024-03-01 11:00:00', 'Membership'],
             [3, 899.99, '2024-03-01 12:00:00', 'Membership']
         ];
-
         await connection.query('INSERT INTO payments (member_id, amount, payment_date, payment_type) VALUES ?', [payments]);
         console.log('Sample payments inserted');
 
-        // Insert sample workout sessions
+        // Insert workout sessions
         const sessions = [
             [1, 1, '2024-03-15', '09:00:00', '10:00:00', 'Full body workout session'],
             [2, 2, '2024-03-15', '10:00:00', '11:00:00', 'Cardio session'],
             [3, 3, '2024-03-15', '11:00:00', '12:00:00', 'Strength training session']
         ];
-
         await connection.query('INSERT INTO workout_sessions (member_id, trainer_id, session_date, start_time, end_time, notes) VALUES ?', [sessions]);
         console.log('Sample workout sessions inserted');
 
-        // Insert sample workout attendance
+        // Insert workout attendance
         const workoutAttendance = [
             [1, 1, '2024-03-15'],
             [2, 2, '2024-03-15'],
             [3, 3, '2024-03-15']
         ];
-
         await connection.query('INSERT INTO workout_attendance (member_id, workout_id, date) VALUES ?', [workoutAttendance]);
         console.log('Sample workout attendance inserted');
 
-        console.log('Database initialization completed successfully');
+        // Insert trainer attendance
+        const trainerAttendance = [
+            [1, '2024-03-15 07:45:00', '2024-03-15 12:00:00'],
+            [2, '2024-03-15 08:00:00', '2024-03-15 11:00:00'],
+            [3, '2024-03-15 09:00:00', '2024-03-15 13:00:00']
+        ];
+        await connection.query('INSERT INTO trainer_attendance (trainer_id, check_in, check_out) VALUES ?', [trainerAttendance]);
+        console.log('Sample trainer attendance inserted');
 
+        console.log('✅ Database initialization completed successfully');
     } catch (error) {
-        console.error('Error initializing database:', error);
+        console.error('❌ Error initializing database:', error);
     } finally {
         if (connection) {
             await connection.end();

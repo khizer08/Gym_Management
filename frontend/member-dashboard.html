@@ -208,28 +208,48 @@
         console.log('Fetched member data:', memberData);
 
         // Update member name
-        document.getElementById('memberName').textContent = memberData.name;
+        document.getElementById('memberName').textContent = memberData.data.name;
 
         // Show PT section if member has a trainer
-        if (memberData.assigned_trainer) {
+        if (memberData.data.assigned_trainer) {
           document.getElementById('ptSection').style.display = 'block';
-          const trainerResponse = await fetch(`http://localhost:3000/api/trainers/${memberData.assigned_trainer}`);
+          const trainerResponse = await fetch(`http://localhost:3000/api/trainers/${memberData.data.assigned_trainer}`);
           const trainerData = await trainerResponse.json();
-          document.getElementById('trainerInfo').textContent = `${trainerData.name} (Specialization: ${trainerData.specialization})`;
+          document.getElementById('trainerInfo').textContent = `${trainerData.data.name} (Specialization: ${trainerData.data.specialization})`;
         }
 
         // Update workout program if available
         const workoutList = document.getElementById('workoutList');
-        if (memberData.assigned_workout_id) {
+        if (memberData.data.assigned_workout_id) {
           try {
-            const workoutResponse = await fetch(`http://localhost:3000/api/workouts/${memberData.assigned_workout_id}`);
+            const workoutResponse = await fetch(`http://localhost:3000/api/workouts/${memberData.data.assigned_workout_id}`);
             const workoutData = await workoutResponse.json();
             
             workoutList.innerHTML = ''; // Clear default message
             const li = document.createElement('li');
-            li.textContent = workoutData.name; // Display workout name
-            workoutList.appendChild(li);
+            li.textContent = workoutData.data.name; // Display workout name
             
+            // Add checkbox for completion
+            const completeCheckbox = document.createElement('input');
+            completeCheckbox.type = 'checkbox';
+            completeCheckbox.id = 'workoutComplete';
+            completeCheckbox.style.marginLeft = '10px'; // Add some spacing
+            completeCheckbox.disabled = true; // Disable initially until we check if completed today
+
+            const label = document.createElement('label');
+            label.htmlFor = 'workoutComplete';
+            label.textContent = 'Mark as Completed';
+            label.style.marginLeft = '5px';
+            label.style.fontSize = '0.9em';
+
+            li.appendChild(completeCheckbox);
+            li.appendChild(label);
+
+            workoutList.appendChild(li);
+
+            // Check if workout is already completed today and enable/check checkbox
+            await checkIfWorkoutCompletedToday(memberData.data.member_id, memberData.data.assigned_workout_id, completeCheckbox);
+
           } catch (workoutError) {
             console.error('Error fetching workout details:', workoutError);
             workoutList.innerHTML = '<li class="no-workout">Error loading workout details.</li>';
@@ -255,7 +275,7 @@
             if (checkOutData.success) {
               localStorage.removeItem('currentMemberId');
               localStorage.removeItem('currentAttendanceId');
-              window.location.href = 'member-login.html';
+              window.location.href = 'index.html';
             } else {
               alert('Error recording check-out. Please try again.');
             }
@@ -269,6 +289,77 @@
         document.getElementById('memberName').textContent = '[Error loading name]';
       }
     });
+
+    async function checkIfWorkoutCompletedToday(memberId, workoutId, checkbox) {
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const response = await fetch(`http://localhost:3000/api/workout-attendance/member/${memberId}`);
+        const data = await response.json();
+
+        if (data.success && data.data) {
+          const completedToday = data.data.some(record => 
+            record.workout_id === workoutId && new Date(record.date).toISOString().split('T')[0] === today
+          );
+
+          if (completedToday) {
+            checkbox.checked = true;
+            checkbox.disabled = true;
+          } else {
+            checkbox.disabled = false; // Enable if not completed today
+            // Add event listener if not completed today
+            checkbox.addEventListener('change', async function() {
+              if (this.checked) {
+                await recordWorkoutCompletion(memberId, workoutId, this);
+              }
+            });
+          }
+        } else {
+          console.error('Error checking workout completion:', data.message);
+           checkbox.disabled = false; // Enable checkbox if check fails
+            // Add event listener if check fails
+            checkbox.addEventListener('change', async function() {
+              if (this.checked) {
+                await recordWorkoutCompletion(memberId, workoutId, this);
+              }
+            });
+        }
+      } catch (error) {
+        console.error('Error checking workout completion:', error);
+         checkbox.disabled = false; // Enable checkbox if error occurs
+          // Add event listener if error occurs
+            checkbox.addEventListener('change', async function() {
+              if (this.checked) {
+                await recordWorkoutCompletion(memberId, workoutId, this);
+              }
+            });
+      }
+    }
+
+    async function recordWorkoutCompletion(memberId, workoutId, checkbox) {
+      try {
+        const response = await fetch('http://localhost:3000/api/workout-attendance/complete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ member_id: memberId, workout_id: workoutId })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert('Workout marked as completed!');
+          checkbox.disabled = true; // Disable after successful completion
+        } else {
+          alert(data.message || 'Failed to mark workout as completed.');
+          checkbox.checked = false; // Uncheck if failed
+        }
+      } catch (error) {
+        console.error('Error recording workout completion:', error);
+        alert('An error occurred while marking workout as completed.');
+        checkbox.checked = false; // Uncheck if error
+      }
+    }
   </script>
 </body>
 </html>

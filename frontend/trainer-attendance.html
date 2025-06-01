@@ -220,12 +220,11 @@
             <th>Check Out</th>
             <th>Duration</th>
             <th>Status</th>
-            <th>Members Trained</th>
           </tr>
         </thead>
         <tbody id="attendanceBody">
           <tr>
-            <td colspan="6" class="loading">Loading attendance records...</td>
+            <td colspan="5" class="loading">Loading attendance records...</td>
           </tr>
         </tbody>
       </table>
@@ -263,7 +262,7 @@
         } else {
           document.getElementById('attendanceBody').innerHTML = `
             <tr>
-              <td colspan="6" class="error-message">Error loading attendance records</td>
+              <td colspan="5" class="error-message">Error loading attendance records</td>
             </tr>
           `;
         }
@@ -271,7 +270,7 @@
         console.error('Error:', error);
         document.getElementById('attendanceBody').innerHTML = `
           <tr>
-            <td colspan="6" class="error-message">Error loading attendance records</td>
+            <td colspan="5" class="error-message">Error loading attendance records</td>
           </tr>
         `;
       }
@@ -294,7 +293,6 @@
           <td>${checkOut ? formatDateTime(checkOut) : '-'}</td>
           <td>${duration}</td>
           <td><span class="status-badge status-${status.toLowerCase()}">${status}</span></td>
-          <td>${record.members_trained || 0}</td>
         `;
         tbody.appendChild(row);
       });

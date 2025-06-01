@@ -129,6 +129,45 @@
       font-size: 0.8rem;
       margin-top: 10px;
     }
+
+    .search-container {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .search-container input[type="text"] {
+      padding: 10px 15px;
+      width: 100%;
+      max-width: 400px;
+      border: 2px solid #dfe6e9;
+      border-radius: 25px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .search-container input[type="text"]:focus {
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(43, 45, 66, 0.2);
+      outline: none;
+    }
+
+    .delete-btn {
+      background: #dc3545; /* Red color for delete */
+      color: white;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      margin-top: 15px;
+    }
+
+    .delete-btn:hover {
+      background: #c82333;
+      transform: translateY(-2px);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
   </style>
 </head>
 <body>
@@ -142,41 +181,40 @@
       <i class="fas fa-arrow-left"></i> Back to Owner Dashboard
     </a>
 
+    <div class="search-container">
+      <input type="text" id="trainerSearch" placeholder="Search by name or ID...">
+    </div>
+
     <div id="trainersGrid" class="trainers-grid">
       <div class="loading">Loading trainers...</div>
     </div>
   </div>
 
   <script>
+    let allTrainers = []; // Store all trainers here
+
     document.addEventListener('DOMContentLoaded', async function() {
       const trainersGrid = document.getElementById('trainersGrid');
+      const trainerSearchInput = document.getElementById('trainerSearch');
 
+      // Fetch trainers initially
+      await fetchTrainers();
+
+      // Add event listener for search input
+      trainerSearchInput.addEventListener('input', function() {
+        filterTrainers(this.value);
+      });
+    });
+
+    async function fetchTrainers() {
+      const trainersGrid = document.getElementById('trainersGrid');
       try {
         const response = await fetch('http://localhost:3000/api/trainers');
         const data = await response.json();
 
         if (data.success) {
-          trainersGrid.innerHTML = ''; // Clear loading message
-          
-          data.data.forEach(trainer => {
-            const trainerCard = document.createElement('div');
-            trainerCard.className = 'trainer-card';
-            
-            trainerCard.innerHTML = `
-              <div class="trainer-info">
-                <h3>${trainer.name}</h3>
-                <span class="specialization-badge">${trainer.specialization}</span>
-              </div>
-              <div class="trainer-details">
-                <p><i class="fas fa-id-card"></i> ID: ${trainer.trainer_id}</p>
-                <p><i class="fas fa-envelope"></i> Email: ${trainer.email}</p>
-                <p><i class="fas fa-phone"></i> Phone: ${trainer.phone}</p>
-                <p><i class="fas fa-calendar-check"></i> Join Date: ${new Date(trainer.created_at).toLocaleDateString()}</p>
-              </div>
-            `;
-            
-            trainersGrid.appendChild(trainerCard);
-          });
+          allTrainers = data.data; // Store fetched trainers
+          displayTrainers(allTrainers); // Display all initially
         } else {
           trainersGrid.innerHTML = '<div class="error-message">Error loading trainers</div>';
         }
@@ -184,7 +222,81 @@
         console.error('Error:', error);
         trainersGrid.innerHTML = '<div class="error-message">Error loading trainers</div>';
       }
-    });
+    }
+
+    function displayTrainers(trainers) {
+      const trainersGrid = document.getElementById('trainersGrid');
+      trainersGrid.innerHTML = ''; // Clear existing content
+
+      if (trainers.length === 0) {
+        trainersGrid.innerHTML = '<div class="loading">No trainers found.</div>';
+        return;
+      }
+
+      trainers.forEach(trainer => {
+        const trainerCard = document.createElement('div');
+        trainerCard.className = 'trainer-card';
+        trainerCard.dataset.trainerId = trainer.trainer_id; // Store trainer ID
+        
+        trainerCard.innerHTML = `
+          <div class="trainer-info">
+            <h3>${trainer.name}</h3>
+            <span class="specialization-badge">${trainer.specialization}</span>
+          </div>
+          <div class="trainer-details">
+            <p><i class="fas fa-id-card"></i> ID: ${trainer.trainer_id}</p>
+            <p><i class="fas fa-envelope"></i> Email: ${trainer.email}</p>
+            <p><i class="fas fa-phone"></i> Phone: ${trainer.phone}</p>
+            <p><i class="fas fa-calendar-check"></i> Join Date: ${new Date(trainer.created_at).toLocaleDateString()}</p>
+          </div>
+          <button class="delete-btn"><i class="fas fa-trash"></i> Delete</button>
+        `;
+
+        // Add event listener for the delete button
+        trainerCard.querySelector('.delete-btn').addEventListener('click', function() {
+          confirmDelete(trainer.trainer_id, trainerCard);
+        });
+        
+        trainersGrid.appendChild(trainerCard);
+      });
+    }
+
+    function filterTrainers(searchTerm) {
+      const filteredTrainers = allTrainers.filter(trainer => {
+        const searchLower = searchTerm.toLowerCase();
+        return (trainer.name && trainer.name.toLowerCase().includes(searchLower)) || 
+               (trainer.trainer_id && trainer.trainer_id.toString().includes(searchLower));
+      });
+      displayTrainers(filteredTrainers);
+    }
+
+    async function confirmDelete(trainerId, trainerCardElement) {
+      if (confirm(`Are you sure you want to delete trainer with ID ${trainerId}?`)) {
+        await deleteTrainer(trainerId, trainerCardElement);
+      }
+    }
+
+    async function deleteTrainer(trainerId, trainerCardElement) {
+      try {
+        const response = await fetch(`http://localhost:3000/api/trainers/${trainerId}`, {
+          method: 'DELETE'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert('Trainer deleted successfully!');
+          trainerCardElement.remove(); // Remove the card from UI
+          // Optionally remove from allTrainers array as well
+          allTrainers = allTrainers.filter(trainer => trainer.trainer_id !== trainerId);
+        } else {
+          alert(data.message || 'Failed to delete trainer.');
+        }
+      } catch (error) {
+        console.error('Error deleting trainer:', error);
+        alert('An error occurred while deleting trainer.');
+      }
+    }
   </script>
 </body>
 </html> 
