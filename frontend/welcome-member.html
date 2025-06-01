@@ -8,15 +8,36 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <style>
+        :root {
+          --primary: #2b2d42;
+          --secondary: #2b2d42;
+          --accent: #2b2d42;
+          --light: #f8f9fa;
+          --dark: #212529;
+        }
+        
         .welcome-container {
             max-width: 600px;
             margin: 50px auto;
             padding: 30px;
             text-align: center;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.6s ease-out forwards;
         }
+        
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
         .welcome-icon {
             font-size: 64px;
             color: #de464e;
@@ -39,29 +60,55 @@
         }
         .action-buttons {
             margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
         }
-        .action-buttons a {
-            display: inline-block;
-            padding: 12px 24px;
-            margin: 0 10px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
+        
+        /* Updated button styles to match role selection */
+        .action-btn {
+          padding: 15px 30px;
+          border-radius: 50px;
+          font-weight: 600;
+          font-size: 1rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          border: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          position: relative;
+          overflow: hidden;
+          color: white;
+          text-decoration: none;
+          background: linear-gradient(135deg, var(--secondary), #1a1a2e);
+          box-shadow: 0 5px 15px rgba(255, 62, 62, 0.5);
         }
-        .login-btn {
-            background: #333;
-            color: white;
-            box-shadow: 0 5px 15px rgba(255, 62, 62, 0.5);
+
+        .action-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(255, 255, 255, 0.1);
+          transform: translateX(-100%);
+          transition: transform 0.3s ease;
         }
-        .home-btn {
-            background: #333;
-            color: white;
-            box-shadow: 0 5px 15px rgba(255, 62, 62, 0.5);
+
+        .action-btn:hover::before {
+          transform: translateX(0);
         }
-        .action-buttons a:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+
+        .action-btn:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 20px rgba(255, 62, 62, 0.6);
+        }
+
+        .action-btn i {
+          font-size: 1.2rem;
         }
     </style>
 </head>
@@ -78,8 +125,12 @@
         </div>
         <p>Please save this ID for future logins.</p>
         <div class="action-buttons">
-            <a href="member-login.html" class="login-btn">Go to Login</a>
-            <a href="index.html" class="home-btn">Back to Home</a>
+            <a href="member-login.html" class="action-btn">
+                <i class="fas fa-sign-in-alt"></i> Go to Login
+            </a>
+            <a href="index.html" class="action-btn">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
         </div>
     </div>
 
@@ -92,4 +143,4 @@
         }
     </script>
 </body>
-</html> 
+</html>
