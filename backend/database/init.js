@@ -24,8 +24,8 @@ async function initializeDatabase() {
         await connection.query('DROP TABLE IF EXISTS attendance');
         await connection.query('DROP TABLE IF EXISTS members');
         await connection.query('DROP TABLE IF EXISTS workouts');
-        await connection.query('DROP TABLE IF EXISTS trainers');
         await connection.query('DROP TABLE IF EXISTS trainer_attendance');
+        await connection.query('DROP TABLE IF EXISTS trainers');
         console.log('Dropped existing tables');
 
         // Create trainers table
