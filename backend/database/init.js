@@ -7,7 +7,7 @@ async function initializeDatabase() {
         connection = await mysql.createConnection({
             host: 'localhost',
             user: 'root',
-            password: 'Surjo@14',
+            password: 'root',
         });
 
         // Create database if it doesn't exist

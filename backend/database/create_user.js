@@ -7,7 +7,7 @@ async function createDatabaseUser() {
         connection = await mysql.createConnection({
             host: 'localhost',
             user: 'root',
-            password: 'Surjo@14'
+            password: 'root'
         });
 
         console.log('Connected to MySQL as root');

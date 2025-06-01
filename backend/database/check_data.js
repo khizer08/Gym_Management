@@ -6,7 +6,7 @@ async function checkData() {
         connection = await mysql.createConnection({
             host: 'localhost',
             user: 'root',
-            password: 'Surjo@14',
+            password: 'root',
             database: 'gym_management'
         });
         console.log('Connected to database.');
