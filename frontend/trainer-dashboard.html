@@ -114,6 +114,58 @@
         outline: none;
     }
 
+    /* Updated button styles to match role selection */
+    #updatePlansBtn {
+      padding: 15px 30px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+      color: white;
+      background: linear-gradient(135deg, var #1a1a2e);
+      box-shadow: 0 5px 15px rgba(255, 62, 62, 0.5);
+      margin: 0 auto;
+    }
+
+    #updatePlansBtn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    #updatePlansBtn:hover::before {
+      transform: translateX(0);
+    }
+
+    #updatePlansBtn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(255, 62, 62, 0.6);
+    }
+
+    #updatePlansBtn:disabled {
+      opacity: 0.7;
+      transform: none !important;
+      cursor: not-allowed;
+    }
+
+    #updatePlansBtn i {
+      font-size: 1.2rem;
+    }
+
   </style>
 </head>
 <body>
@@ -129,7 +181,9 @@
       </div>
 
       <div id="updateButtonContainer" class="update-button-container" style="display: none;">
-         <button id="updatePlansBtn">Update Plans</button>
+         <button id="updatePlansBtn">
+          <i class="fas fa-sync-alt"></i> Update Plans
+         </button>
       </div>
        <div class="form-footer">
         <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Logout</a>
