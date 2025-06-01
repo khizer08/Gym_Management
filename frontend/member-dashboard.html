@@ -200,7 +200,7 @@
     document.addEventListener('DOMContentLoaded', async function() {
       try {
         // Fetch member data from backend
-        const memberId = new URLSearchParams(window.location.search).get('id');
+        const memberId = localStorage.getItem('currentMemberId');
         const response = await fetch(`http://localhost:3000/api/members/${memberId}`);
         const memberData = await response.json();
 
@@ -225,6 +225,32 @@
             workoutList.appendChild(li);
           });
         }
+
+        // Handle logout
+        document.querySelector('.back-link').addEventListener('click', async function(e) {
+          e.preventDefault();
+          const attendanceId = localStorage.getItem('currentAttendanceId');
+          
+          try {
+            // Record check-out
+            const checkOutResponse = await fetch(`http://localhost:3000/api/attendance/check-out/${attendanceId}`, {
+              method: 'PUT'
+            });
+
+            const checkOutData = await checkOutResponse.json();
+            
+            if (checkOutData.success) {
+              localStorage.removeItem('currentMemberId');
+              localStorage.removeItem('currentAttendanceId');
+              window.location.href = 'member-login.html';
+            } else {
+              alert('Error recording check-out. Please try again.');
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            alert('Error during logout. Please try again.');
+          }
+        });
       } catch (error) {
         console.error('Error loading member data:', error);
         document.getElementById('memberName').textContent = '[Error loading name]';

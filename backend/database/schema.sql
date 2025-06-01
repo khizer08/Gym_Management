@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS workout_attendance;
 DROP TABLE IF EXISTS workout_sessions;
 DROP TABLE IF EXISTS payments;
 DROP TABLE IF EXISTS attendance;
+DROP TABLE IF EXISTS trainer_attendance;
 DROP TABLE IF EXISTS members;
 DROP TABLE IF EXISTS workouts;
 DROP TABLE IF EXISTS equipment;
@@ -100,4 +101,13 @@ CREATE TABLE IF NOT EXISTS workout_attendance (
     date DATE NOT NULL,
     FOREIGN KEY (member_id) REFERENCES members(member_id),
     FOREIGN KEY (workout_id) REFERENCES workouts(workout_id)
+);
+
+-- Trainer attendance table (depends on trainers)
+CREATE TABLE IF NOT EXISTS trainer_attendance (
+    attendance_id INT AUTO_INCREMENT PRIMARY KEY,
+    trainer_id INT NOT NULL,
+    check_in TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    check_out TIMESTAMP NULL,
+    FOREIGN KEY (trainer_id) REFERENCES trainers(trainer_id)
 ); 

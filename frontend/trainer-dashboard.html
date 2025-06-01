@@ -67,12 +67,46 @@
       const updateButtonContainer = document.getElementById('updateButtonContainer');
       const updatePlansBtn = document.getElementById('updatePlansBtn');
 
-      // --- Placeholder for getting Trainer ID and Name ---
-      // You will need to replace this with your actual logic
-      // (e.g., reading from local storage after login)
-      const trainerId = 1; // Example trainer ID
-      trainerNameSpan.textContent = 'Trainer User'; // Example trainer name
-      // --------------------------------------------------
+      const trainerId = localStorage.getItem('currentTrainerId');
+
+      try {
+        // Fetch trainer data
+        const trainerResponse = await fetch(`http://localhost:3000/api/trainers/${trainerId}`);
+        const trainerData = await trainerResponse.json();
+        trainerNameSpan.textContent = trainerData.name;
+
+        // Fetch members and workouts
+        await fetchMembersAndWorkouts();
+
+        // Handle logout
+        document.querySelector('.back-link').addEventListener('click', async function(e) {
+          e.preventDefault();
+          const attendanceId = localStorage.getItem('currentAttendanceId');
+          
+          try {
+            // Record check-out
+            const checkOutResponse = await fetch(`http://localhost:3000/api/trainer-attendance/check-out/${attendanceId}`, {
+              method: 'PUT'
+            });
+
+            const checkOutData = await checkOutResponse.json();
+            
+            if (checkOutData.success) {
+              localStorage.removeItem('currentTrainerId');
+              localStorage.removeItem('currentAttendanceId');
+              window.location.href = 'trainer-login.html';
+            } else {
+              alert('Error recording check-out. Please try again.');
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            alert('Error during logout. Please try again.');
+          }
+        });
+      } catch (error) {
+        console.error('Error:', error);
+        membersListDiv.innerHTML = '<p class="error-message">Error loading data. Please try again.</p>';
+      }
 
       async function fetchMembersAndWorkouts() {
         try {
@@ -188,9 +222,6 @@
         // Optionally re-fetch members to show updated state, though not strictly necessary here
         // fetchMembersAndWorkouts();
       });
-
-      // Initial fetch of members and workouts
-      fetchMembersAndWorkouts();
     });
   </script>
 </body>
