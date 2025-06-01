@@ -190,8 +190,8 @@
       </ul>
     </div>
     
-    <a href="member-login.html" class="back-link">
-      <i class="fas fa-arrow-left"></i> Back to Login
+    <a href="index.html" class="back-link">
+      <i class="fas fa-arrow-left"></i> Logout
     </a>
   </div>
 
@@ -203,6 +203,9 @@
         const memberId = localStorage.getItem('currentMemberId');
         const response = await fetch(`http://localhost:3000/api/members/${memberId}`);
         const memberData = await response.json();
+
+        // Log member data to console for debugging
+        console.log('Fetched member data:', memberData);
 
         // Update member name
         document.getElementById('memberName').textContent = memberData.name;
@@ -216,14 +219,24 @@
         }
 
         // Update workout program if available
-        if (memberData.workout_program && memberData.workout_program.length > 0) {
-          const workoutList = document.getElementById('workoutList');
-          workoutList.innerHTML = '';
-          memberData.workout_program.forEach(workout => {
+        const workoutList = document.getElementById('workoutList');
+        if (memberData.assigned_workout_id) {
+          try {
+            const workoutResponse = await fetch(`http://localhost:3000/api/workouts/${memberData.assigned_workout_id}`);
+            const workoutData = await workoutResponse.json();
+            
+            workoutList.innerHTML = ''; // Clear default message
             const li = document.createElement('li');
-            li.textContent = workout;
+            li.textContent = workoutData.name; // Display workout name
             workoutList.appendChild(li);
-          });
+            
+          } catch (workoutError) {
+            console.error('Error fetching workout details:', workoutError);
+            workoutList.innerHTML = '<li class="no-workout">Error loading workout details.</li>';
+          }
+        } else {
+          // Display default message if no workout is assigned
+          workoutList.innerHTML = '<li class="no-workout">Your workout program will appear here once assigned by your trainer</li>';
         }
 
         // Handle logout

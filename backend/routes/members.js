@@ -58,11 +58,31 @@ router.post('/', async (req, res) => {
 // Update member
 router.put('/:id', async (req, res) => {
     try {
-        const { name, age, gender, phone, email, membership_plan, assigned_trainer, assigned_workout_id } = req.body;
-        await pool.query(
-            'UPDATE members SET name = ?, age = ?, gender = ?, phone = ?, email = ?, membership_plan = ?, assigned_trainer = ?, assigned_workout_id = ? WHERE member_id = ?',
-            [name, age, gender, phone, email, membership_plan, assigned_trainer, assigned_workout_id, req.params.id]
-        );
+        const memberId = req.params.id;
+        const updates = req.body;
+        const updateFields = [];
+        const updateValues = [];
+
+        // Build the update query dynamically
+        for (const key in updates) {
+            if (updates.hasOwnProperty(key)) {
+                // Exclude member_id from being updated this way
+                if (key !== 'member_id') {
+                    updateFields.push(`${key} = ?`);
+                    updateValues.push(updates[key]);
+                }
+            }
+        }
+
+        if (updateFields.length === 0) {
+            return res.status(400).json({ success: false, message: 'No update fields provided' });
+        }
+
+        const query = `UPDATE members SET ${updateFields.join(', ')} WHERE member_id = ?`;
+        updateValues.push(memberId);
+
+        await pool.query(query, updateValues);
+
         res.json({ success: true, message: 'Member updated successfully' });
     } catch (error) {
         console.error('Error updating member:', error);
