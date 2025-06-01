@@ -142,6 +142,11 @@
       border-bottom: none;
     }
     
+    .no-workout {
+      font-style: italic;
+      color: #666;
+    }
+    
     .back-link {
       display: block;
       text-align:center;
@@ -170,19 +175,18 @@
     </div>
     
     <div class="welcome-message">
-      <p>👋 Hello [Member Name]!</p>
+      <p>👋 Hello <span id="memberName">[Loading...]</span>!</p>
     </div>
     
-    <div class="pt-section">
-      <p>You have a personal trainer assigned.</p>
+    <div id="ptSection" class="pt-section" style="display: none;">
+      <h3>Your Personal Trainer:</h3>
+      <p id="trainerInfo">[Loading trainer information...]</p>
     </div>
     
     <div class="workout-program">
       <h3>Your Workout Program:</h3>
-      <ul>
-        <li>Day 1: Chest + Triceps</li>
-        <li>Day 2: Back + Biceps</li>
-        <li>Day 3: Legs</li>
+      <ul id="workoutList">
+        <li class="no-workout">Your workout program will appear here once assigned by your trainer</li>
       </ul>
     </div>
     
@@ -190,5 +194,42 @@
       <i class="fas fa-arrow-left"></i> Back to Login
     </a>
   </div>
+
+  <script>
+    // This would typically come from your backend API
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        // Fetch member data from backend
+        const memberId = new URLSearchParams(window.location.search).get('id');
+        const response = await fetch(`http://localhost:3000/api/members/${memberId}`);
+        const memberData = await response.json();
+
+        // Update member name
+        document.getElementById('memberName').textContent = memberData.name;
+
+        // Show PT section if member has a trainer
+        if (memberData.assigned_trainer) {
+          document.getElementById('ptSection').style.display = 'block';
+          const trainerResponse = await fetch(`http://localhost:3000/api/trainers/${memberData.assigned_trainer}`);
+          const trainerData = await trainerResponse.json();
+          document.getElementById('trainerInfo').textContent = `${trainerData.name} (Specialization: ${trainerData.specialization})`;
+        }
+
+        // Update workout program if available
+        if (memberData.workout_program && memberData.workout_program.length > 0) {
+          const workoutList = document.getElementById('workoutList');
+          workoutList.innerHTML = '';
+          memberData.workout_program.forEach(workout => {
+            const li = document.createElement('li');
+            li.textContent = workout;
+            workoutList.appendChild(li);
+          });
+        }
+      } catch (error) {
+        console.error('Error loading member data:', error);
+        document.getElementById('memberName').textContent = '[Error loading name]';
+      }
+    });
+  </script>
 </body>
 </html>
