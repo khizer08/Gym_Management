@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IronPulse Gym | Owner Portal</title>
+  <title>IronPulse Gym | Owner Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --primary: #ff3e3e;
+      --primary: #2b2d42;
       --secondary: #2b2d42;
-      --accent: #f8c537;
+      --accent: #2b2d42;
       --light: #f8f9fa;
       --dark: #212529;
       --error: #e63946;
@@ -31,37 +31,45 @@
       align-items: center;
       color: var(--secondary);
     }
-        body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url('') no-repeat center center fixed;
-  background-size: cover;
-  filter: brightness(1.0); 
-  z-index: -1;
-}
     
-    .login-form {
-      background: rgba(255, 255, 255, 0.5);      
-      border-radius: 20px;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
-      padding: 3rem;
-      width: 90%;
-      max-width: 450px;
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('images/pic1.jpg') no-repeat center center fixed;
+      background-size: cover;
+      filter: brightness(1.0);
+      z-index: -1;
     }
     
-    .login-header {
+    .login-form {
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+      padding: 3rem 4rem;
+      width: 90%;
+      max-width: 450px;
       text-align: center;
-      margin-bottom: 2.5rem;
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     
     .login-header h2 {
       font-size: 2rem;
-      color: var(--secondary);
-      margin-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
       position: relative;
       display: inline-block;
     }
@@ -74,79 +82,97 @@
       transform: translateX(-50%);
       width: 60px;
       height: 4px;
-      background: var(--primary);
+      background: var(--secondary);
       border-radius: 2px;
-    }
-    
-    .login-header p {
-      color: #666;
-      font-size: 0.9rem;
     }
     
     .form-group {
       margin-bottom: 1.5rem;
-      position: relative;
+      text-align: left;
     }
     
     .form-group label {
       display: block;
       margin-bottom: 0.5rem;
       font-weight: 500;
-      color: var(--secondary);
     }
     
     .input-field {
       width: 100%;
       padding: 12px 15px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
+      border: 2px solid #dfe6e9;
+      border-radius: 12px;
       font-size: 1rem;
       transition: all 0.3s;
-      padding-left: 40px;
     }
     
     .input-field:focus {
-      border-color: var(--primary);
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(255, 62, 62, 0.2);
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(43, 45, 66, 0.2);
     }
     
-    .input-icon {
+      .login-btn {
+  width: 325px;
+  padding: 15px 0; 
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+  color: white;
+  background: linear-gradient(135deg, var(--secondary), #1a1a2e);
+  box-shadow: 0 5px 15px rgba(255, 62, 62, 0.5);
+}
+
+    
+    .login-btn::before {
+      content: '';
       position: absolute;
-      left: 15px;
-      top: 38px;
-      color: #999;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
     }
     
-    .password-container {
-      position: relative;
+    .login-btn:hover::before {
+      transform: translateX(0);
     }
     
-    .toggle-password {
-      position: absolute;
-      right: 15px;
-      top: 12px;
-      cursor: pointer;
-      color: #999;
+    .login-btn i {
+      font-size: 1.2rem;
     }
     
     .login-btn {
-      width: 100%;
-      padding: 14px;
       background: linear-gradient(135deg, var(--secondary), #1a1a2e);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      margin-top: 1rem;
+      box-shadow: 0 5px 15px  rgba(255, 62, 62, 0.5);
     }
     
     .login-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(43, 45, 66, 0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px  rgba(255, 62, 62, 0.5);
+    }
+    
+    .back-btn {
+      margin-top: 2rem;
+      display: inline-block;
+      color: var(--secondary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    
+    .back-btn:hover {
+      color: var(--primary);
     }
     
     .error-message {
@@ -157,12 +183,11 @@
     }
     
     .back-link {
-      display: block;
-      text-align: center;
+      display: inline-block;
       margin-top: 1.5rem;
       color: var(--secondary);
       text-decoration: none;
-      font-size: 0.9rem;
+      font-weight: 500;
       transition: color 0.3s;
     }
     
@@ -180,29 +205,29 @@
     .shake {
       animation: shake 0.5s;
     }
+    
+    @media (max-width: 480px) {
+      .login-form {
+        padding: 2rem;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="login-form">
     <div class="login-header">
-      <h2>Owner Portal</h2>
-      <p>Access your gym management dashboard</p>
+      <h2>Owner Login</h2>
     </div>
     
     <form id="ownerLoginForm" onsubmit="handleLogin(event)">
       <div class="form-group">
         <label for="username">Username</label>
-        <i class="fas fa-user input-icon"></i>
-        <input type="text" id="username" name="username" class="input-field" placeholder="Enter your username" required>
+        <input type="text" id="username" class="input-field" placeholder="Enter username" required>
       </div>
       
       <div class="form-group">
         <label for="password">Password</label>
-        <i class="fas fa-lock input-icon"></i>
-        <div class="password-container">
-          <input type="password" id="password" name="password" class="input-field" placeholder="Enter your password" required>
-          <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility()"></i>
-        </div>
+        <input type="password" id="password" class="input-field" placeholder="Enter password" required>
         <div class="error-message" id="errorMessage">
           Invalid username or password. Please try again.
         </div>
@@ -225,11 +250,12 @@
       const errorMessage = document.getElementById('errorMessage');
       const form = document.getElementById('ownerLoginForm');
       
-      // Simple hardcoded check (in production, use server-side validation)
+      // Hardcoded credentials check (for demo only)
       if (username === "owner" && password === "admin123") {
-        // Simulate loading
+        // Show loading state
         document.querySelector('.login-btn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating';
         
+        // Simulate authentication delay
         setTimeout(() => {
           window.location.href = "owner-dashboard.html";
         }, 1000);
@@ -244,21 +270,6 @@
         
         // Clear password field
         document.getElementById('password').value = '';
-      }
-    }
-    
-    function togglePasswordVisibility() {
-      const passwordField = document.getElementById('password');
-      const toggleIcon = document.querySelector('.toggle-password');
-      
-      if (passwordField.type === 'password') {
-        passwordField.type = 'text';
-        toggleIcon.classList.remove('fa-eye');
-        toggleIcon.classList.add('fa-eye-slash');
-      } else {
-        passwordField.type = 'password';
-        toggleIcon.classList.remove('fa-eye-slash');
-        toggleIcon.classList.add('fa-eye');
       }
     }
   </script>
